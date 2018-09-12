@@ -1,0 +1,165 @@
+import {
+  Component,
+  OnInit,
+  AfterViewInit,
+  AfterContentInit,
+  Input,
+  Output,
+  EventEmitter,
+  QueryList,
+  ViewChildren,
+  ElementRef,
+} from '@angular/core';
+import {
+  IMatCascader,
+  IMatCascaderView,
+  IMatCascaderContainer,
+} from './mat-cascader.interface';
+import {
+  MatCascaderService,
+} from './mat-cascader.service';
+import {
+  MatMenuTrigger,
+  MatMenu,
+} from '@angular/material';
+
+@Component({
+  selector: 'ngx-mat-cascader',
+  templateUrl: './mat-cascader.component.html',
+  styleUrls: ['./mat-cascader.component.scss']
+})
+export class MatCascaderComponent implements OnInit, AfterViewInit {
+  @Input()
+  data: IMatCascader[] = [{
+    value: 1,
+    text: 'one',
+    children: [{
+      value: 11,
+      text: 'one one',
+    }, {
+      value: 12,
+      text: 'one two'
+    }]
+  }, {
+    value: 2,
+    text: 'two',
+  }];
+  @Input()
+  onlyLeaf = true;
+
+  private _value: (string | number)[] = [];
+  @Input()
+  get value() {
+    return this._value;
+  }
+  set value(nV) {
+    if (this._value !== nV) {
+      this._value = nV;
+      this.valueChange.emit(nV);
+    }
+  }
+  @Output()
+  valueChange = new EventEmitter<(string | number)[]>();
+
+  @Input()
+  placeholder = '';
+
+  @Input()
+  separate = ' / ';
+
+  valueText = '';
+
+
+  @ViewChildren(MatMenu)
+  matMenus: QueryList<MatMenu>;
+  matMenuContainers: IMatCascaderContainer[] = [];
+  root: MatMenu;
+
+  constructor(
+    private _matCascaderService: MatCascaderService,
+  ) { }
+
+  ngOnInit() {
+    this.matMenuContainers = this._flatten(this.data);
+  }
+
+  ngAfterViewInit() {
+    this.matMenuContainers.forEach(item => {
+      const el = this.matMenus.find((menu => (menu['_elementRef'] as ElementRef).nativeElement.id === item.id)) as MatMenu;
+
+      setTimeout(() => {
+        if (item.parent === null) {
+          this.root = el;
+        } else {
+          item.parent.childRef = el;
+        }
+      });
+    });
+  }
+
+  onMenuItemClick(menu: IMatCascaderView): void {
+    if (this.onlyLeaf) {
+      this._setValueOfLeaf(menu);
+    } else {
+      this._setValueOfPath(menu);
+    }
+  }
+
+  private _setValueOfLeaf(menu: IMatCascaderView): void {
+    if (menu.children !== undefined) {
+      return;
+    }
+
+    this.value = this._getValueByMenu(menu);
+    this.valueText = this._getValueTextByMenu(menu);
+  }
+
+  private _setValueOfPath(menu: IMatCascaderView): void {
+    this.value = this._getValueByMenu(menu);
+    this.valueText = this._getValueTextByMenu(menu);
+  }
+
+  private _getValueByMenu(menu: IMatCascaderView): (string | number)[] {
+    let _value: (string | number)[] = [];
+    _value.push(menu.value);
+
+    if (menu.container !== undefined && menu.container.parent !== null) {
+      _value = _value.concat(this._getValueByMenu(menu.container.parent));
+    }
+
+    return _value.reverse();
+  }
+
+  private _getValueTextByMenu(menu: IMatCascaderView): string {
+    let _text: (string | number)[] = [];
+    _text.push(menu.text);
+
+    if (menu.container !== undefined && menu.container.parent !== null) {
+      _text = _text.concat(this._getValueTextByMenu(menu.container.parent));
+    }
+
+    return _text.reverse().join(this.separate);
+  }
+
+  private _flatten(before: IMatCascaderView[] = [], parent: IMatCascaderView | null = null): IMatCascaderContainer[] {
+    let after: IMatCascaderContainer[] = [];
+
+    const menu: IMatCascaderContainer = {
+      id: this._matCascaderService.id,
+      menus: before,
+      parent,
+    };
+
+    after.push(menu);
+
+    before.forEach(view => {
+      view.container = menu;
+
+      if (view.children && Object.prototype.toString.call(view.children) === '[object Array]') {
+        after = after.concat(this._flatten(view.children, view));
+      }
+    });
+
+    return after;
+  }
+}

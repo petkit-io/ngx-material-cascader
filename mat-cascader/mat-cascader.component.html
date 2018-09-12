@@ -1,0 +1,17 @@
+<mat-form-field *ngIf="root">
+  <input matInput [placeholder]="placeholder" [value]="valueText" [matMenuTriggerFor]="root" readonly="true"/>
+</mat-form-field>
+
+<ng-container *ngFor="let container of matMenuContainers">
+  <mat-menu id="{{container.id}}" overlapTrigger="false">
+    <ng-container *ngFor="let menu of container.menus">
+      <ng-container *ngIf="menu.childRef">
+        <button (click)="onMenuItemClick(menu);" mat-menu-item [matMenuTriggerFor]="menu.childRef">{{menu.text}}</button>
+      </ng-container>
+      <ng-container *ngIf="!menu.childRef">
+        <button (click)="onMenuItemClick(menu);" mat-menu-item>{{menu.text}}</button>
+      </ng-container>
+    </ng-container>
+  </mat-menu>
+</ng-container>
+

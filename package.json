@@ -1,0 +1,41 @@
+{
+  "name": "@petkit/ngx-material-cascader",
+  "version": "1.0.0",
+  "description": "Angular material cascader component",
+  "main": "index.js",
+  "scripts": {
+    "version": "conventional-changelog -p angular -i CHANGELOG.md -s -r 0 && git add CHANGELOG.md",
+    "commitmsg": "commitlint -e $GIT_PARAMS"
+  },
+  "ngPackage": {
+    "dest": "../../../dist/ngx-material-cascader",
+    "lib": {
+      "entryFile": "public-api.ts",
+      "umdModuleIds": {}
+    },
+    "whitelistedNonPeerDependencies": []
+  },
+  "peerDependencies": {
+    "@angular/material": "^6.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/petkit-io/ngx-material-cascader.git"
+  },
+  "keywords": [
+    "angular",
+    "material",
+    "cascader"
+  ],
+  "author": "liuxin",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/petkit-io/ngx-material-cascader/issues"
+  },
+  "homepage": "https://github.com/petkit-io/ngx-material-cascader#readme",
+  "config": {
+    "commitizen": {
+      "path": "cz-conventional-changelog"
+    }
+  }
+}
