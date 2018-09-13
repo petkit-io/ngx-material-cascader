@@ -30,20 +30,7 @@ import {
 })
 export class MatCascaderComponent implements OnInit, AfterViewInit {
   @Input()
-  data: IMatCascader[] = [{
-    value: 1,
-    text: 'one',
-    children: [{
-      value: 11,
-      text: 'one one',
-    }, {
-      value: 12,
-      text: 'one two'
-    }]
-  }, {
-    value: 2,
-    text: 'two',
-  }];
+  data: IMatCascader[] = [];
   @Input()
   onlyLeaf = true;
 
@@ -81,6 +68,8 @@ export class MatCascaderComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.matMenuContainers = this._flatten(this.data);
+
+    this._setValueTextByValue(this.value);
   }
 
   ngAfterViewInit() {
@@ -119,6 +108,33 @@ export class MatCascaderComponent implements OnInit, AfterViewInit {
     this.valueText = this._getValueTextByMenu(menu);
   }
 
+  private _setValueTextByValue(value: (string | number)[]): void {
+    value = value || this.value;
+
+    const text = this._getTextByValue(this.data, value);
+
+    this.valueText = this._getValueTextByTexts(text);
+  }
+
+  private _getTextByValue(data: IMatCascader[], value: (string | number)[]): string[] {
+    const [curr, ...rest] = value;
+
+    if (!curr) {
+      return [];
+    }
+
+    const node = data.find(item => item.value === curr) as IMatCascader;
+
+    let result: string[] = [];
+    result.push(node.text);
+
+    if (rest && node.children) {
+      result = result.concat(this._getTextByValue(node.children, rest));
+    }
+
+    return result;
+  }
+
   private _getValueByMenu(menu: IMatCascaderView): (string | number)[] {
     let _value: (string | number)[] = [];
     _value.push(menu.value);
@@ -131,14 +147,18 @@ export class MatCascaderComponent implements OnInit, AfterViewInit {
   }
 
   private _getValueTextByMenu(menu: IMatCascaderView): string {
-    let _text: (string | number)[] = [];
+    let _text: string[] = [];
     _text.push(menu.text);
 
     if (menu.container !== undefined && menu.container.parent !== null) {
       _text = _text.concat(this._getValueTextByMenu(menu.container.parent));
     }
 
-    return _text.reverse().join(this.separate);
+    return this._getValueTextByTexts(_text.reverse());
+  }
+
+  private _getValueTextByTexts(texts: string[]): string {
+    return texts.join(this.separate);
   }
 
   private _flatten(before: IMatCascaderView[] = [], parent: IMatCascaderView | null = null): IMatCascaderContainer[] {
