@@ -1,6 +1,6 @@
 # ngx-material-cascader
 Angular material cascader component
-![example](https://github.com/petkit-io/assets/blob/master/ngx-material-cascader.gif)
+![example](https://raw.githubusercontent.com/petkit-io/assets/master/ngx-material-cascader.gif)
 
 # Installation
 
