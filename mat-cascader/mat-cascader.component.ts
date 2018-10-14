@@ -84,7 +84,6 @@ export class MatCascaderComponent implements OnInit, AfterViewInit, OnChanges {
         currentValue,
       } = data;
 
-      console.log(data);
       this.root = null;
       this._initContainers();
       setTimeout(() => {
@@ -99,13 +98,8 @@ export class MatCascaderComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private _initRefs() {
-    console.log(this.matMenuContainers);
-    console.log(this.matMenus);
-
     this.matMenuContainers.forEach(item => {
       const el = this.matMenus.find((menu => (menu['_elementRef'] as ElementRef).nativeElement.id === item.id)) as MatMenu;
-
-      console.log(item.parent, el);
 
       setTimeout(() => {
         if (item.parent === null) {
