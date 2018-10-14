@@ -1,8 +1,8 @@
 import {
   Component,
   OnInit,
+  OnChanges,
   AfterViewInit,
-  AfterContentInit,
   Input,
   Output,
   EventEmitter,
@@ -28,7 +28,7 @@ import {
   templateUrl: './mat-cascader.component.html',
   styleUrls: ['./mat-cascader.component.scss']
 })
-export class MatCascaderComponent implements OnInit, AfterViewInit {
+export class MatCascaderComponent implements OnInit, AfterViewInit, OnChanges {
   @Input()
   data: IMatCascader[] = [];
   @Input()
@@ -60,21 +60,52 @@ export class MatCascaderComponent implements OnInit, AfterViewInit {
   @ViewChildren(MatMenu)
   matMenus: QueryList<MatMenu>;
   matMenuContainers: IMatCascaderContainer[] = [];
-  root: MatMenu;
+  root: MatMenu | null;
 
   constructor(
     private _matCascaderService: MatCascaderService,
   ) { }
 
   ngOnInit() {
-    this.matMenuContainers = this._flatten(this.data);
-
-    this._setValueTextByValue(this.value);
+    this._initContainers();
   }
 
   ngAfterViewInit() {
+    this._initRefs();
+  }
+
+  ngOnChanges(changes) {
+    const {
+      data,
+    } = changes;
+
+    if (data && !data.firstChange) {
+      const {
+        currentValue,
+      } = data;
+
+      console.log(data);
+      this.root = null;
+      this._initContainers();
+      setTimeout(() => {
+        this._initRefs();
+      });
+    }
+  }
+
+  private _initContainers() {
+    this.matMenuContainers = this._flatten(this.data);
+    this._setValueTextByValue(this.value);
+  }
+
+  private _initRefs() {
+    console.log(this.matMenuContainers);
+    console.log(this.matMenus);
+
     this.matMenuContainers.forEach(item => {
       const el = this.matMenus.find((menu => (menu['_elementRef'] as ElementRef).nativeElement.id === item.id)) as MatMenu;
+
+      console.log(item.parent, el);
 
       setTimeout(() => {
         if (item.parent === null) {
@@ -99,8 +130,7 @@ export class MatCascaderComponent implements OnInit, AfterViewInit {
       return;
     }
 
-    this.value = this._getValueByMenu(menu);
-    this.valueText = this._getValueTextByMenu(menu);
+    this._setValueOfPath(menu);
   }
 
   private _setValueOfPath(menu: IMatCascaderView): void {
