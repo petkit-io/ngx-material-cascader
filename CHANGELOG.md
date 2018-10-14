@@ -1,3 +1,13 @@
+<a name="1.0.3"></a>
+## [1.0.3](https://github.com/petkit-io/ngx-material-cascader/compare/v1.0.2...v1.0.3) (2018-10-14)
+
+
+### Features
+
+* **cascader:** implement new data ([9c8218f](https://github.com/petkit-io/ngx-material-cascader/commit/9c8218f))
+
+
+
 <a name="1.0.2"></a>
 ## [1.0.2](https://github.com/petkit-io/ngx-material-cascader/compare/v1.0.1...v1.0.2) (2018-09-20)
 
