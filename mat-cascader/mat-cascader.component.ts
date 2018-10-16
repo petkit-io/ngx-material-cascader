@@ -128,7 +128,7 @@ export class MatCascaderComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   private _setValueOfPath(menu: IMatCascaderView): void {
-    this.value = this._getValueByMenu(menu);
+    this.value = this._getValueByMenu(menu).reverse();
     this.valueText = this._getValueTextByMenu(menu);
   }
 
@@ -167,7 +167,7 @@ export class MatCascaderComponent implements OnInit, AfterViewInit, OnChanges {
       _value = _value.concat(this._getValueByMenu(menu.container.parent));
     }
 
-    return _value.reverse();
+    return _value;
   }
 
   private _getValueTextByMenu(menu: IMatCascaderView): string {
