@@ -149,6 +149,11 @@ export class MatCascaderComponent implements OnInit, AfterViewInit, OnChanges {
 
     const node = data.find(item => item.value === curr) as IMatCascader;
 
+    if (!node) {
+      console.log('Can not find value: ', curr, 'in: ', this);
+      return [];
+    }
+
     let result: string[] = [];
     result.push(node.text);
 
