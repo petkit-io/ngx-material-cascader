@@ -2,9 +2,10 @@ import { ControlValueAccessor } from '@angular/forms';
 import { Subject } from 'rxjs';
 
 export class NgModelBase implements ControlValueAccessor {
-  public propagateChange = (v: any) => {};
-  public _innerValue: any;
+  public _innerValue: any[] = [];
   public _innerValue$: Subject<any> = new Subject();
+
+  public propagateChange: (v: any) => void = (v: any) => v;
 
   set value(v: any) {
     if (v !== this._innerValue) {
@@ -28,5 +29,5 @@ export class NgModelBase implements ControlValueAccessor {
     this.propagateChange = fn;
   }
 
-  registerOnTouched(fn: any) {}
+  registerOnTouched() {}
 }

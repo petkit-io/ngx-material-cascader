@@ -1,6 +1,7 @@
 import {
   Component,
   OnInit,
+  OnDestroy,
   OnChanges,
   AfterViewInit,
   Input,
@@ -12,6 +13,13 @@ import {
   forwardRef,
 } from '@angular/core';
 import {
+  MatMenuTrigger,
+  MatMenu,
+} from '@angular/material';
+import {
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
+import {
   IMatCascader,
   IMatCascaderView,
   IMatCascaderContainer,
@@ -20,32 +28,25 @@ import {
   MatCascaderService,
 } from './mat-cascader.service';
 import {
-  MatMenuTrigger,
-  MatMenu,
-} from '@angular/material';
-import { NgModelBase } from './ngModel.class';
+  NgModelBase,
+} from './ngModel.class';
 import {
-  NG_VALUE_ACCESSOR
-} from '@angular/forms';
-import { cloneDeep, map } from 'lodash';
+  Subscription,
+} from 'rxjs';
 
 @Component({
   selector: 'ngx-mat-cascader',
   templateUrl: './mat-cascader.component.html',
   styleUrls: ['./mat-cascader.component.scss'],
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => MatCascaderComponent),
-      multi: true
-    }
-  ],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => MatCascaderComponent),
+    multi: true
+  }],
 })
-export class MatCascaderComponent extends NgModelBase implements OnInit, AfterViewInit, OnChanges {
-  _data: IMatCascader[] = [];
+export class MatCascaderComponent extends NgModelBase implements OnInit, AfterViewInit, OnChanges, OnDestroy {
   @Input()
-  set data(v: IMatCascader[]) { this._data = cloneDeep(v); }
-  get data() { return this._data; }
+  data: IMatCascader[] = [];
 
   @Input()
   onlyLeaf = true;
@@ -77,21 +78,30 @@ export class MatCascaderComponent extends NgModelBase implements OnInit, AfterVi
   matMenuContainers: IMatCascaderContainer[] = [];
   root: MatMenu | null;
 
+  private _sub: Subscription;
+
   constructor(
     private _matCascaderService: MatCascaderService,
   ) {
     super();
-    this._innerValue$.subscribe(v => {
-      if (!!v) {
-          this._initContainers();
-          setTimeout(() => {
-              this._initRefs();
-          });
-      }
-  });
+
+    this._sub = this._innerValue$.subscribe(v => {
+      this.propagateChange(v);
+      this.valueChange.emit(v);
+
+      this._setValueTextByValue(v);
+    });
   }
 
-  ngOnInit() {}
+  ngOnInit() {
+    this._initContainers();
+  }
+
+  ngOnDestroy() {
+    if (this._sub) {
+      this._sub.unsubscribe();
+    }
+  }
 
   ngAfterViewInit() {
     this._initRefs();
@@ -151,15 +161,7 @@ export class MatCascaderComponent extends NgModelBase implements OnInit, AfterVi
   }
 
   private _setValueOfPath(menu: IMatCascaderView): void {
-    let nV = this._getValueByMenu(menu).reverse();
-    if (this._innerValue !== nV) {
-      if (!this._innerValue)
-          this._innerValue = [];
-      this._innerValue.splice(0);
-      map(nV, item => this._innerValue.push(item));
-      this.propagateChange(this._innerValue);
-      this.valueChange.emit(this._innerValue);
-    }
+    this.value = this._getValueByMenu(menu).reverse();
 
     this.valueText = this._getValueTextByMenu(menu);
   }
