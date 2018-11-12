@@ -1,3 +1,19 @@
+<a name="1.0.5"></a>
+## [1.0.5](https://github.com/petkit-io/ngx-material-cascader/compare/v1.0.4...v1.0.5) (2018-11-12)
+
+
+### Bug Fixes
+
+* **cascader:** fixed node check ([d2cd17a](https://github.com/petkit-io/ngx-material-cascader/commit/d2cd17a))
+* **cascader:** remove lodash, dealing value change in subs ([6250099](https://github.com/petkit-io/ngx-material-cascader/commit/6250099))
+
+
+### Features
+
+* ngModel two way bind ([#1](https://github.com/petkit-io/ngx-material-cascader/issues/1)) ([6541b76](https://github.com/petkit-io/ngx-material-cascader/commit/6541b76))
+
+
+
 <a name="1.0.4"></a>
 ## [1.0.4](https://github.com/petkit-io/ngx-material-cascader/compare/v1.0.3...v1.0.4) (2018-10-16)
 
